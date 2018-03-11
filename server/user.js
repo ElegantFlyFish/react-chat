@@ -1,12 +1,13 @@
-const utils = require('utility');
-const express = require('express');
-const Router = express.Router();
-const model = require('./model');
-const User = model.getModel('user');
+const utils = require('utility')
+const express = require('express')
+const Router = express.Router()
+const model = require('./model')
+const User = model.getModel('user')
+const Chat = model.getModel('chat')
 
 const filter = { pwd:0, __v:0 }
 
-Router.get('/list',(req,res) => {
+Router.get('/list',(req, res) => {
   //User.remove({},(err,doc)=>{})
   const { type } = req.query
   User.find({type},(err,doc) => {
@@ -17,6 +18,15 @@ Router.get('/list',(req,res) => {
     }
   });
 }) 
+
+Router.get('/getmsglist',(req, res) => {
+  const user = req.cookies.user
+  Chat.find({},(err, doc) => {
+    if(!err){
+      return res.json({ code:0, msgs:doc})
+    }
+  } )
+})
 
 Router.post('/login',(req, res) => {
   const { user, pwd } = req.body

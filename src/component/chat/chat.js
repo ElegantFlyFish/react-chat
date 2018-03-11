@@ -1,14 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import io from 'socket.io-client'
 import { List, InputItem } from 'antd-mobile'
-
+import io from 'socket.io-client'
+import { getMsgList, sendMsg, recvMsg } from '../../redux/chat.redux'
 
 const socket = io('ws://localhost:8989')
-// @connect(
-//   state => state.chatuser,
-//   { getUserList }
-// )
+
+@connect(
+  state => state,
+  { getMsgList, sendMsg, recvMsg }
+)
 class Chat extends React.Component{
   constructor(props){
     super(props)
@@ -18,16 +19,24 @@ class Chat extends React.Component{
     }
   }
   componentDidMount(){
+    console.log(this.props)
+    this.props.getMsgList()
+    this.props.recvMsg()
     //const socket = io('ws://localhost:8989')
-    socket.on('receiveMsg',v => {
-      console.log(v)
-      this.setState({
-        msg:[...this.state.msg,v.text]
-      })
-    })
+    // socket.on('receiveMsg',v => {
+    //   console.log(v)
+    //   this.setState({
+    //     msg:[...this.state.msg,v.text]
+    //   })
+    // })
   }
   handleSubmit(){
-    socket.emit('sendMsg',{ text:this.state.text })
+   // socket.emit('sendMsg',{ text:this.state.text })
+    //this.setState({ text:'' })
+    const from = this.props.user._id
+    const to = this.props.match.params.user
+    const msg = this.state.text
+    this.props.sendMsg({from, to, msg})
     this.setState({ text:'' })
   }
   render(){
@@ -35,8 +44,8 @@ class Chat extends React.Component{
     //console.log();
     return (
       <div>
-        { this.state.msg.map(v => {
-          return <p key={v}>{v}</p>
+        { this.props.chat.chatmsg.map(v => {
+          return <p key={v._id}>{v.content}</p>
         }) }
         <List className = "stick-footer">
           <InputItem
