@@ -27,7 +27,7 @@ Router.get('/getmsglist',(req, res) => {
       users[v._id] = { name:v.user, avatar:v.avatar }
     })
     Chat.find({'$or':[ {from:user}, {to:user}] }, (err, doc) => {
-      console.log(doc)
+      //console.log(doc)
       if(!err){
         return res.json({ code:0, msgs:doc, users:users})
       }
@@ -63,6 +63,22 @@ Router.post('/register',(req, res) => {
         return res.json({ code:0 ,data:{ user, type, _id } })
       }
     })
+  })
+})
+
+Router.post('/readmsg',function(req, res){
+  console.log(req.cookies.userid)
+  const userid = req.cookies.userid
+  const { from } = req.body
+  Chat.update(
+    {from, to:userid},
+    {'$set':{ read:true }},
+    {'multi':true},
+    function(err,doc){
+    if(!err){
+      return res.json({code:0})
+    }
+    return res.json({ code:1, msg:`服务器错误：${err}`})
   })
 })
 
