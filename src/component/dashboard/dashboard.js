@@ -2,20 +2,25 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { NavBar } from 'antd-mobile'
 import { Switch, Route } from 'react-router-dom'
-
 import NavLinkBar from  '../navlink/navlink'
 import Boss from '../boss/boss'
 import Genius from '../genius/genius'
 import UserCenter from '../usercenter/usercenter'
 
-function Msg(){
-  return <div>消息首页</div>
-}
+import {recvMsg, getMsgList} from '../../redux/chat.redux'
+import Msg from '../msg/msg'
 
 @connect(
-  state => state
+  state => state,
+  {getMsgList, recvMsg}
 )
 class Dashboard extends React.Component{
+  componentDidMount(){
+    if(!this.props.chat.chatmsg.length){
+      this.props.getMsgList()
+      this.props.recvMsg()
+    }
+  }
   render(){
     const user = this.props.user
     const { pathname } = this.props.location

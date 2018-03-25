@@ -19,7 +19,7 @@ class UserCard extends React.Component{
               v.avatar ? 
               <Card key = { v._id } onClick = {()=>{ this.handleClick(v) }}>
                 <Header
-                  title = {v.title}
+                  title = {v.user}
                   thumb = { require(`../img/${v.avatar}.png`) }
                   extra = { <span>{ v.title }</span> }
                 />

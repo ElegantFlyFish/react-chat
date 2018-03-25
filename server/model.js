@@ -23,7 +23,7 @@ const models = {
     'to':{'type':String, 'require':true},
     'read':{'type':Boolean, 'default':false},
     'content':{'type':String,'require':true,default:''},
-    'create_time':{'type':String,default:new Date()}
+    'create_time':{'type':String,default:Date.now}
   }
 }
 

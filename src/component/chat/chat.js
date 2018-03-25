@@ -1,8 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { List, InputItem } from 'antd-mobile'
+import { List, InputItem, NavBar, Icon } from 'antd-mobile'
 import io from 'socket.io-client'
 import { getMsgList, sendMsg, recvMsg } from '../../redux/chat.redux'
+import { getChatId } from '../../util'
 
 const socket = io('ws://localhost:8989')
 
@@ -19,16 +20,10 @@ class Chat extends React.Component{
     }
   }
   componentDidMount(){
-    console.log(this.props)
-    this.props.getMsgList()
-    this.props.recvMsg()
-    //const socket = io('ws://localhost:8989')
-    // socket.on('receiveMsg',v => {
-    //   console.log(v)
-    //   this.setState({
-    //     msg:[...this.state.msg,v.text]
-    //   })
-    // })
+    if(!this.props.chat.chatmsg.length){
+      this.props.getMsgList()
+      this.props.recvMsg()
+    }
   }
   handleSubmit(){
    // socket.emit('sendMsg',{ text:this.state.text })
@@ -40,13 +35,43 @@ class Chat extends React.Component{
     this.setState({ text:'' })
   }
   render(){
-    //console.log(this.props)
-    //console.log();
+    const userid = this.props.match.params.user
+    const Item = List.Item
+    const users = this.props.chat.users
+    if(!users[userid]){
+      return null
+    }
+    const chatid = getChatId(userid, this.props.user._id)
+    const chatmsgs = this.props.chat.chatmsg.filter(v => v.chatid === chatid )
     return (
-      <div>
-        { this.props.chat.chatmsg.map(v => {
-          return <p key={v._id}>{v.content}</p>
-        }) }
+      <div id="chat-page">
+        <NavBar
+          mode="dark"
+          icon={<Icon type="left" />}
+          onLeftClick={() => this.props.history.goBack()}>
+          { users[userid].name }
+        </NavBar>
+
+        {chatmsgs.map(v => {
+          const avatar = require(`../img/${users[v.from].avatar}.png`)
+          return v.from === userid?
+          (
+            <List key = { v._id }>
+              <Item
+                thumb = { avatar }
+              >{ v.content }</Item>
+            </List>
+          ):
+          (
+            <List key = { v._id }>
+              <Item 
+              className = "chat-me"
+              extra = { <img src = { avatar } /> }
+              >{ v.content }</Item>
+            </List>
+          )
+        })}
+
         <List className = "stick-footer">
           <InputItem
             value = { this.state.text }
